@@ -10,7 +10,6 @@ var dynamics = {
   jshint        : 'gulp-jshint',
   jshint_stylish: 'jshint-stylish',
   rimraf        : 'rimraf',
-  yargs         : 'yargs',
 }
 
 var jshintrc = path.resolve(__dirname, '..', 'shared', '.jshintrc');
@@ -28,10 +27,11 @@ function AzkGulp(config) {
   }
 
   // Set default
-  config.src  = config.src  || "src";
-  config.spec = config.spec || "spec";
-  config.lint = config.lint || [];
-  this.config = config;
+  config.src   = config.src   || "src";
+  config.spec  = config.spec  || "spec";
+  config.lint  = config.lint  || [];
+  config.clean = config.clean || true;
+  this.config  = config;
 
   this.set_getters();
 
@@ -41,7 +41,15 @@ function AzkGulp(config) {
   this.init_watchs();
 
   // Add a task to render the output
+  // TODO: Add options to help
   this.gulp.task('help', this.taskListing);
+
+  var self = this;
+  this.gulp.task('screen-clean', function() {
+    if (self.yargs.argv.clean) {
+      process.stdout.write('\u001B[2J\u001B[0;0f');
+    }
+  });
 }
 
 AzkGulp.prototype = {
@@ -51,6 +59,15 @@ AzkGulp.prototype = {
       self.__defineGetter__(property, function() {
         return require(dynamics[property]);
       });
+    });
+
+    self.__defineGetter__('yargs', function() {
+      if (!self.__yargs) {
+        self.__yargs = require('yargs')
+          .default('clean', self.config.clean);
+        console.log(self.__yargs);
+      }
+      return self.__yargs;
     });
   },
 
@@ -117,14 +134,14 @@ AzkGulp.prototype = {
   init_watchs: function() {
     var self = this;
     var src_opts = { cwd: self.config.cwd };
-    var tasks = [];
+    var tasks = ['screen-clean'];
 
     var add_watch = function(name, build_dir) {
-      var task = 'watch-' + name;
+      var subtask = ['screen-clean', 'babel-' + name];
+      var task    = 'watch-' + name;
       tasks.push(task);
-      self.gulp.task(task, function() {
+      self.gulp.task(task, subtask, function() {
         var src     = build_dir + '/**/*.js'
-        var subtask = ['babel-' + name];
         self.gulp.watch(src, src_opts, subtask);
       });
     }
@@ -151,9 +168,9 @@ AzkGulp.prototype = {
     self.gulp.task('spec', ['mocha']);
 
     var watch_tasks = {
-      'watch-mocha': ['mocha'],
-      'watch-mocha-lint': ['mocha', 'lint'],
-      'watch-lint-mocha': ['lint' , 'mocha'],
+      'watch-mocha': ['screen-clean', 'mocha'],
+      'watch-mocha-lint': ['screen-clean', 'mocha', 'lint'],
+      'watch-lint-mocha': ['screen-clean', 'lint' , 'mocha'],
     };
 
     Object.keys(watch_tasks).forEach(function(task) {

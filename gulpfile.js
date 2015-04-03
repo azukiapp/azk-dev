@@ -4,6 +4,10 @@ var gutil = require('gulp-util');
 var yargs = require('yargs');
 var taskListing = require('gulp-task-listing');
 
+gulp.task('screen-clean', function() {
+  process.stdout.write('\u001B[2J\u001B[0;0f');
+});
+
 gulp.task('spec', function() {
   var mocha_opts = {
     report : 'spec',
@@ -17,8 +21,10 @@ gulp.task('spec', function() {
     .on('error', function() { this.emit('end'); });
 });
 
-gulp.task('watch-spec', ['spec'], function() {
-  return gulp.watch(['*.js', 'spec/**/*.js'], ['spec']);
+var spec_tasks = ['screen-clean', 'spec'];
+gulp.task('watch-spec', spec_tasks, function() {
+  var src = ['./*.js', 'spec/*.js', 'spec/fixtures/!(lib)/*.js'];
+  gulp.watch(src, spec_tasks);
 });
 
 // Add a task to render the output
