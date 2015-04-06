@@ -2,10 +2,12 @@ var path = require('path');
 
 var dynamics = {
   gulp          : 'gulp',
+  gutil         : 'gulp-util',
   mocha         : 'gulp-mocha',
   taskListing   : 'gulp-task-listing',
   babel         : 'gulp-babel',
   sourcemaps    : 'gulp-sourcemaps',
+  symlink       : 'gulp-symlink',
   jscs          : 'gulp-jscs',
   jshint        : 'gulp-jshint',
   jshint_stylish: 'jshint-stylish',
@@ -39,6 +41,7 @@ function AzkGulp(config) {
   this.init_lints();
   this.init_builds();
   this.init_watchs();
+  this.init_editor();
 
   // Add a task to render the output
   // TODO: Add options to help
@@ -65,10 +68,31 @@ AzkGulp.prototype = {
       if (!self.__yargs) {
         self.__yargs = require('yargs')
           .default('clean', self.config.clean);
-        console.log(self.__yargs);
       }
       return self.__yargs;
     });
+  },
+
+  init_editor: function() {
+    var self = this, tasks = [];
+
+    var add_files = function(name, files) {
+      var srcs = [];
+      for(var i = 0; i < files.length; i++) {
+        srcs[i]  = path.resolve(__dirname, "shared", files[i]);
+        files[i] = path.join('./', files[i]);
+      }
+
+      tasks.push(name);
+      self.gulp.task(name, function() {
+        self.gulp.src(srcs).pipe(self.symlink(files, { force: true}));
+      });
+    }
+
+    add_files('editor-link-lint', ['.jscsrc', '.jshintrc']);
+    add_files('editor-link-config', ['.editorconfig']);
+
+    self.gulp.task('editor-config', tasks);
   },
 
   init_builds: function() {
@@ -120,7 +144,7 @@ AzkGulp.prototype = {
       return self.gulp.src(paths, src_opts)
         .pipe(self.jshint(jshintrc))
         .pipe(self.jshint.reporter(jshint_stylish))
-        .pipe(self.jshint.reporter('fail'))
+        .pipe(self.jshint.reporter('fail'));
     });
 
     self.gulp.task('jscs', function() {
@@ -157,7 +181,6 @@ AzkGulp.prototype = {
     var self = this;
     var src_opts = { read: false, cwd: self.config.cwd };
     var src = 'lib/' + self.config.spec + '/**/*_spec.js';
-    console.log(src);
     self.gulp.task('mocha', ['babel'], function() {
       return self.gulp.src(src, src_opts)
         .pipe( self.mocha( {

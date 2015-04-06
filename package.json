@@ -30,6 +30,7 @@
     "gulp-jshint": "^1.10.0",
     "gulp-mocha": "^2.0.1",
     "gulp-sourcemaps": "^1.5.1",
+    "gulp-symlink": "^2.1.0",
     "gulp-task-listing": "^1.0.0",
     "gulp-util": "^3.0.4",
     "jshint-stylish": "^1.0.1",
@@ -38,6 +39,7 @@
     "yargs": "^3.6.0"
   },
   "devDependencies": {
+    "bluebird": "^2.9.24",
     "shelljs": "^0.4.0"
   },
   "engines": {

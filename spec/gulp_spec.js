@@ -1,7 +1,9 @@
-var h     = require('./spec-helper');
-var shell = require('shelljs');
-var path  = require('path');
-var gulp  = require('gulp');
+var h       = require('./spec-helper');
+var shell   = require('shelljs');
+var path    = require('path');
+var gulp    = require('gulp');
+var Promise = require('bluebird');
+var pfs     = Promise.promisifyAll(require('fs'));
 
 describe("azk-dev gulp", function() {
   var fixture = path.join(__dirname, 'fixtures');
@@ -15,11 +17,28 @@ describe("azk-dev gulp", function() {
       // console.log(out);
       cb();
     });
+  };
+
+  var dot_files = [
+    '.editorconfig', '.jscsrc', '.jshintrc'
+  ];
+  var removeEditorConfigs = function() {
+    // Clear dot files
+    var file, promises = [];
+    for(var i = 0; i < dot_files.length; i++) {
+      file = path.join(fixture, dot_files[i]);
+      promises.push(pfs.unlinkAsync(file).catch(function() {}));
+    }
+    return Promise.all(promises);
   }
 
   // Protect change path
   var cwd = process.cwd();
-  after(function() { shell.cd(cwd) });
+  before(removeEditorConfigs);
+  after(function() {
+    shell.cd(cwd);
+    return removeEditorConfigs();
+  });
 
   it("should suporte run custom task with args", function(cb) {
     runGulp("gulp custom --custom 'my mensagem'", function() {
@@ -35,6 +54,31 @@ describe("azk-dev gulp", function() {
       h.expect(result.out).to.match(/\s* ✓ should divide\s*$/m);
       h.expect(result.code).to.equal(0);
       cb();
+    });
+  });
+
+  it("should create a links", function() {
+    var check_files = function() {
+      var file, promises = [];
+      for(var i = 0; i < dot_files.length; i++) {
+        file = path.join(fixture, dot_files[i]);
+        promises.push(pfs.lstatAsync(file).catch(function() {}));
+      }
+      return Promise.all(promises);
+    }
+
+    return check_files()
+    .then(function(result) {
+      h.expect(result).to.eql([undefined, undefined, undefined]);
+      return Promise.fromNode(runGulp.bind(this, "gulp editor-config"));
+    })
+    .then(function() {
+      return check_files();
+    })
+    .then(function(result) {
+      for(var i = 0; i < result.length; i++) {
+        h.expect(result[i].isSymbolicLink()).to.ok;
+      }
     });
   });
 

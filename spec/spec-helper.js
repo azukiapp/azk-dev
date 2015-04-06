@@ -1,10 +1,5 @@
-var chai  = require('chai');
 
-// Chai extensions
-chai.use(require('chai-as-promised'));
-chai.use(require('chai-things'));
-chai.config.includeStack = true;
-
+// Helper to use expect
 module.exports = {
-  expect : chai.expect,
+  expect : require('../chai').expect,
 };
