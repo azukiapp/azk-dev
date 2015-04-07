@@ -52,6 +52,27 @@ Create symlinks to `shared/.jscsrc`, `shared/.jshintrc` and `shared/.editorconfi
 $  gulp editor-config
 ```
 
+## Deploy npm package
+
+Adding this in package.json:
+
+```js
+"deploy" : "./node_modules/.bin/npm-deploy"
+```
+
+Now you can deploy package with:
+
+```shell
+$ npm run deploy [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease]
+```
+
+This should run the following steps:
+
+  - Check if not tracked commits in git
+  - Run tests with `npm test`
+  - Upgrade version in `package.json`, commit and add tag
+  - Publish package in npmjs.com
+
 ## TODO
 
 - Notify: https://github.com/mikaelbr/gulp-notify
