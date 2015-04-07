@@ -1,11 +1,11 @@
 {
   "name": "azk-dev",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Library which holds the basic tools for the development of azk projects",
   "main": "index.js",
   "scripts": {
-    "test" : "./bin/gulp test",
-    "deploy" : "./bin/npm-deploy"
+    "test": "./bin/gulp test",
+    "deploy": "./bin/npm-deploy"
   },
   "repository": {
     "type": "git",
