@@ -13,6 +13,9 @@ var dynamics = {
   jshint_stylish: 'jshint-stylish',
   rimraf        : 'rimraf',
   help          : 'gulp-help',
+  notify        : 'gulp-notify',
+  plumber       : 'gulp-plumber',
+  sequence      : 'run-sequence',
 };
 
 var helps = {
@@ -31,6 +34,7 @@ var helps = {
   "screen:clean"      : "clean screen (scroll bottom to the top)",
   "test"              : "run all tests",
   "watch"             : "wait for changes source and spec before run babel",
+  "watch:lint"        : "wait for changes source and spec before run lint",
   "watch:lint:test"   : "wait for changes source and spec before run lint and tests",
   "watch:spec"        : "wait for changes spec before run babel",
   "watch:src"         : "wait for changes source before run babel",
@@ -41,16 +45,13 @@ var helps = {
 var jshintrc = path.resolve(__dirname, 'shared', '.jshintrc');
 var jscsrc   = path.resolve(__dirname, 'shared', '.jscsrc');
 
-function swallowError (error) {
-  //If you want details of the error in the console
-  console.log(error.stack ? error.stack : error.toString());
-  this.emit('end');
-}
-
 function AzkGulp(config) {
   if (!(this instanceof arguments.callee)) {
     return new arguments.callee(config);
   }
+
+  // Run a watch task
+  this.watching = false;
 
   // Set default
   config.src     = config.src     || "src";
@@ -62,18 +63,18 @@ function AzkGulp(config) {
 
   this.set_getters();
 
-  this.init_mocha();
-  this.init_lints();
-  this.init_builds();
-  this.init_watchs();
-  this.init_editor();
-
   var self = this;
   self.new_task('screen:clean', function() {
     if (self.yargs.argv.clean) {
       process.stdout.write('\u001B[2J\u001B[0;0f');
     }
   });
+
+  this.init_lints();
+  this.init_builds();
+  this.init_watchs();
+  this.init_editor();
+  this.init_mocha();
 
   // default task
   var default_help = 'Run "' + config.default.join(",") + '" tasks';
@@ -160,9 +161,9 @@ AzkGulp.prototype = {
       babel_tasks.push(babel_task);
       self.new_task(babel_task, [clean_task], function () {
         return self.gulp.src(build_dir + '/**/*.js', src_opts)
+          .pipe(self.watching ? self.plumber() : self.gutil.noop())
           .pipe(self.sourcemaps.init())
           .pipe(self.babel())
-          .on('error', swallowError)
           .pipe(self.sourcemaps.write())
           .pipe(self.gulp.dest(path.join('lib', build_dir), src_opts));
       });
@@ -186,14 +187,16 @@ AzkGulp.prototype = {
 
     self.new_task('jshint', function() {
       return self.gulp.src(paths, src_opts)
+        .pipe(self.watching ? self.plumber() : self.gutil.noop())
         .pipe(self.jshint(jshintrc))
         .pipe(self.jshint.reporter(self.jshint_stylish))
-        .pipe(self.jshint.reporter('fail'));
+        .pipe(self.jshint.reporter('fail'))
     });
 
     self.new_task('jscs', function() {
       return self.gulp.src(paths, src_opts)
-        .pipe(self.jscs(jscsrc));
+        .pipe(self.watching ? self.plumber() : self.gutil.noop())
+        .pipe(self.jscs(jscsrc))
     });
 
     self.new_task('lint', ['jscs', 'jshint']);
@@ -201,24 +204,26 @@ AzkGulp.prototype = {
 
   init_watchs: function() {
     var self = this;
-    var src_opts = { cwd: self.config.cwd };
-    var tasks = ['screen:clean'];
+    var src_opts  = { cwd: self.config.cwd };
+    var watch_all = {
+      tasks: [],
+      srcs : []
+    }
 
     var add_watch = function(name, build_dir) {
-      var subtask = ['screen:clean', 'babel:' + name];
-      var task    = 'watch:' + name;
-      tasks.push(task);
-      self.new_task(task, subtask, function() {
-        var src     = build_dir + '/**/*.js';
-        self.gulp.watch(src, src_opts, subtask);
-      });
+      var task = 'babel:' + name;
+      var src  = build_dir + '/**/*.js';
+      watch_all.tasks.push(task);
+      watch_all.srcs.push(src);
+      self.new_watch('watch:' + name, src, src_opts, ['screen:clean', task]);
     };
 
     add_watch("src" , self.config.src);
     add_watch("spec", self.config.spec);
 
-    // alias for all
-    self.new_task('watch', tasks);
+    // Watch all
+    self.new_watch('watch', watch_all.srcs, src_opts, ['screen:clean', watch_all.tasks]);
+    self.new_watch('watch:lint', watch_all.srcs, src_opts, ['screen:clean', 'lint', watch_all.tasks]);
   },
 
   init_mocha: function() {
@@ -227,10 +232,11 @@ AzkGulp.prototype = {
     var src = 'lib/' + self.config.spec + '/**/*_spec.js';
     self.new_task('test', ['babel'], function() {
       process.env.NODE_ENV = process.env.NODE_ENV || "test";
-      return self.gulp.src(src, src_opts)
+      self.gulp.src(src, src_opts)
+        .pipe(self.watching ? self.plumber() : self.gutil.noop())
         .pipe(self.mocha({
           reporter: 'spec',
-          growl: 'true',
+          // growl: 'true',
           grep: self.yargs.argv.grep,
           timeout: 4000
         }));
@@ -247,10 +253,7 @@ AzkGulp.prototype = {
         self.config.src  + '/**/*.js',
         self.config.spec + '/**/*.js',
       ];
-      var subtask = watch_tasks[task];
-      self.new_task(task, subtask, function() {
-        self.gulp.watch(src, { cwd: self.config.cwd }, subtask);
-      });
+      self.new_watch(task, src, { cwd: self.config.cwd }, watch_tasks[task]);
     });
   },
 
@@ -262,6 +265,20 @@ AzkGulp.prototype = {
     }
     args.unshift(task);
     this.gulp.task.apply(this.gulp, args);
+  },
+
+  new_watch: function(task, src, src_opts, subtasks) {
+    var self = this;
+    var sequence_name = task + ':sequence';
+    self.new_task(sequence_name, false, function() {
+      self.sequence.apply(self, subtasks);
+    });
+    self.new_task(task, function() {
+      self.watching = true;
+      self.sequence(sequence_name, function() {
+        self.gulp.watch(src, src_opts, [sequence_name]);
+      });
+    });
   }
 };
 
