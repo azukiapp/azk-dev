@@ -53,11 +53,12 @@ function AzkGulp(config) {
   }
 
   // Set default
-  config.src   = config.src   || "src";
-  config.spec  = config.spec  || "spec";
-  config.lint  = config.lint  || [];
-  config.clean = config.clean || true;
-  this.config  = config;
+  config.src     = config.src     || "src";
+  config.spec    = config.spec    || "spec";
+  config.lint    = config.lint    || [];
+  config.clean   = config.clean   || true;
+  config.default = config.default || [ "lint", "test" ];
+  this.config = config;
 
   this.set_getters();
 
@@ -67,16 +68,16 @@ function AzkGulp(config) {
   this.init_watchs();
   this.init_editor();
 
-  // Add a task to render the output
-  // TODO: Add options to help
-  // this.gulp.task('help', this.taskListing);
-
   var self = this;
   self.new_task('screen:clean', function() {
     if (self.yargs.argv.clean) {
       process.stdout.write('\u001B[2J\u001B[0;0f');
     }
   });
+
+  // default task
+  var default_help = 'Run "' + config.default.join(",") + '" tasks';
+  self.new_task("default", default_help, config.default);
 
   // Load envs
   var env_file = path.join(config.cwd, ".env");

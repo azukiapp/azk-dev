@@ -1,6 +1,7 @@
 
 var azk_gulp = require('../../gulp')({
   cwd  : __dirname,
+  default: [ "show:envs" ],
 });
 
 var gulp = azk_gulp.gulp;

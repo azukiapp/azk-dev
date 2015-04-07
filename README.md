@@ -27,10 +27,11 @@ $ gulp help
 
 ##### Available configs:
 
-- **src:**   default: "src";
-- **spec:**  default: "spec";
-- **lint:**  default: [];
-- **clean:** default: true;
+- **src:**     default: "src";
+- **spec:**    default: "spec";
+- **lint:**    default: [];
+- **clean:**   default: true;
+- **default:** default: [ "lint", "test" ];
 
 ## Chai
 
