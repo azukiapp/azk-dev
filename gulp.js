@@ -1,4 +1,5 @@
-var path = require('path');
+var path   = require('path');
+var dotenv = require('dotenv');
 
 var dynamics = {
   // gulp          : 'gulp',
@@ -76,6 +77,10 @@ function AzkGulp(config) {
       process.stdout.write('\u001B[2J\u001B[0;0f');
     }
   });
+
+  // Load envs
+  var env_file = path.join(config.cwd, ".env");
+  dotenv.load( { path: env_file });
 }
 
 AzkGulp.prototype = {
@@ -220,6 +225,7 @@ AzkGulp.prototype = {
     var src_opts = { read: false, cwd: self.config.cwd };
     var src = 'lib/' + self.config.spec + '/**/*_spec.js';
     self.new_task('test', ['babel'], function() {
+      process.env.NODE_ENV = process.env.NODE_ENV || "test";
       return self.gulp.src(src, src_opts)
         .pipe(self.mocha({
           reporter: 'spec',

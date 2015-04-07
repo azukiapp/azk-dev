@@ -44,6 +44,10 @@ Create symlinks to `shared/.jscsrc`, `shared/.jshintrc` and `shared/.editorconfi
 $  gulp editor-config
 ```
 
+## TODO
+
+- Notify: https://github.com/mikaelbr/gulp-notify
+
 ## License
 
 "Azuki", "Azk" and the Azuki logo are copyright (c) 2013-2015 Azuki Serviços de Internet LTDA.

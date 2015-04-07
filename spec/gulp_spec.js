@@ -15,7 +15,7 @@ describe("azk-dev gulp", function() {
       result.code = code;
       result.out  = out;
       // console.log(out);
-      cb();
+      cb(null, result);
     });
   };
 
@@ -80,6 +80,15 @@ describe("azk-dev gulp", function() {
         h.expect(result[i].isSymbolicLink()).to.ok;
       }
     });
+  });
+
+  it("should load envs variables from .env", function() {
+    return Promise.fromNode(runGulp.bind(this, "bash -c 'TEST_VAR_FROM_ENV=foobar gulp show:envs'"))
+      .then(function(result) {
+        h.expect(result.code).to.equal(0);
+        h.expect(result.out).to.match(/^\s*TEST_VAR_FROM_FILE: 'thefile'/m);
+        h.expect(result.out).to.match(/\s*TEST_VAR_FROM_ENV: 'foobar'/m);
+      });
   });
 
   describe("call help", function() {
