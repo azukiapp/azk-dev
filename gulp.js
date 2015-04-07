@@ -13,7 +13,7 @@ var dynamics = {
   jshint_stylish: 'jshint-stylish',
   rimraf        : 'rimraf',
   help          : 'gulp-help',
-}
+};
 
 var helps = {
   "babel"             : "transpile source and spec (es6 to es5).",
@@ -36,7 +36,7 @@ var helps = {
   "watch:src"         : "wait for changes source before run babel",
   "watch:test"        : "wait for changes source and spec before run tests",
   "watch:test:lint"   : "wait for changes source and spec before run tests and lint",
-}
+};
 
 var jshintrc = path.resolve(__dirname, 'shared', '.jshintrc');
 var jscsrc   = path.resolve(__dirname, 'shared', '.jscsrc');
@@ -48,7 +48,7 @@ function swallowError (error) {
 }
 
 function AzkGulp(config) {
-  if(!(this instanceof arguments.callee)) {
+  if (!(this instanceof arguments.callee)) {
     return new arguments.callee(config);
   }
 
@@ -80,7 +80,7 @@ function AzkGulp(config) {
 
   // Load envs
   var env_file = path.join(config.cwd, ".env");
-  dotenv.load( { path: env_file });
+  dotenv.load( { path: env_file, silent: true });
 }
 
 AzkGulp.prototype = {
@@ -95,7 +95,7 @@ AzkGulp.prototype = {
           // afterPrintCallback: function(tasks) {
           //   console.log(tasks);
           // }
-        }
+        };
         self.__gulp = self.help(require('gulp'), help_opts);
       }
       return self.__gulp;
@@ -121,7 +121,7 @@ AzkGulp.prototype = {
 
     var add_files = function(name, files) {
       var srcs = [];
-      for(var i = 0; i < files.length; i++) {
+      for (var i = 0; i < files.length; i++) {
         srcs[i]  = path.resolve(__dirname, "shared", files[i]);
         files[i] = path.join('./', files[i]);
       }
@@ -130,7 +130,7 @@ AzkGulp.prototype = {
       self.new_task(name, function() {
         self.gulp.src(srcs).pipe(self.symlink(files, { force: true}));
       });
-    }
+    };
 
     add_files('editor:link:lint', ['.jscsrc', '.jshintrc']);
     add_files('editor:link:config', ['.editorconfig']);
@@ -165,7 +165,7 @@ AzkGulp.prototype = {
           .pipe(self.sourcemaps.write())
           .pipe(self.gulp.dest(path.join('lib', build_dir), src_opts));
       });
-    }
+    };
 
     add_build("src" , self.config.src);
     add_build("spec", self.config.spec);
@@ -208,10 +208,10 @@ AzkGulp.prototype = {
       var task    = 'watch:' + name;
       tasks.push(task);
       self.new_task(task, subtask, function() {
-        var src     = build_dir + '/**/*.js'
+        var src     = build_dir + '/**/*.js';
         self.gulp.watch(src, src_opts, subtask);
       });
-    }
+    };
 
     add_watch("src" , self.config.src);
     add_watch("spec", self.config.spec);
@@ -262,6 +262,6 @@ AzkGulp.prototype = {
     args.unshift(task);
     this.gulp.task.apply(this.gulp, args);
   }
-}
+};
 
 module.exports = AzkGulp;
