@@ -29,7 +29,7 @@ var helps = {
   "jshint"            : "run jshint hover the source and spec files",
   "lint"              : "run jshint and jscs hover the source and spec files",
   "screen:clean"      : "clean screen (scroll bottom to the top)",
-  "test"              : "run all test tests",
+  "test"              : "run all tests",
   "watch"             : "wait for changes source and spec before run babel",
   "watch:lint:test"   : "wait for changes source and spec before run lint and tests",
   "watch:spec"        : "wait for changes spec before run babel",

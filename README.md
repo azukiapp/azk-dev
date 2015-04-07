@@ -2,7 +2,7 @@
 
 ## Gulp Tasks (commons azk project tasks)
 
-Howto import commons azk-dev gulp tasks and extends:
+How to import commons azk-dev gulp tasks and extends:
 
 ```js
 // gulpfile.js
@@ -24,6 +24,13 @@ Check the tasks added to the running gulp (yes we have a `gulp help` \o/):
 ```shel
 $ gulp help
 ```
+
+##### Available configs:
+
+- **src:**   default: "src";
+- **spec:**  default: "spec";
+- **lint:**  default: [];
+- **clean:** default: true;
 
 ## Chai
 
