@@ -5,7 +5,7 @@ var azk_gulp = require('../../gulp')({
 
 var gulp = azk_gulp.gulp;
 
-gulp.task("custom", function() {
-  console.log(azk_gulp.yargs.argv.custom);
+gulp.task("show:args", "custom help", function() {
+  console.log(azk_gulp.yargs.argv);
   return null;
 });
