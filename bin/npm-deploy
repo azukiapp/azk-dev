@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+version="${1:-patch}"
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "\n$(tput setaf 1)Make commit the changes before publishing$(tput sgr0)\n"
+  git status
+else
+  echo "Publish npm package..."
+  npm test
+  npm version ${version} -m "Bumped version to %s"
+  npm publish
+fi

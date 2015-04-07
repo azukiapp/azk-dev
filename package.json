@@ -4,7 +4,8 @@
   "description": "Library which holds the basic tools for the development of azk projects",
   "main": "index.js",
   "scripts": {
-    "test": "./bin/gulp spec"
+    "test" : "./bin/gulp test",
+    "deploy" : "./bin/npm-deploy"
   },
   "repository": {
     "type": "git",
@@ -14,7 +15,8 @@
     "url": "https://github.com/azukiapp/azk-dev/issues"
   },
   "bin": {
-    "gulp": "./bin/gulp"
+    "gulp": "./bin/gulp",
+    "npm-deploy": "./bin/npm-deploy"
   },
   "author": "Éverton Ribeiro <everton@azukiapp.com>",
   "homepage": "https://github.com/azukiapp/azk-dev",
