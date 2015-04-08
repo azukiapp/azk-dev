@@ -186,7 +186,7 @@ AzkGulp.prototype = {
         return self.gulp.src(build_dir + '/**/*.js', src_opts)
           .pipe(self.watching ? self.plumber() : self.gutil.noop())
           .pipe(self.sourcemaps.init())
-          .pipe(self.babel(self.config.babel));
+          .pipe(self.babel(self.config.babel))
           .pipe(self.sourcemaps.write())
           .pipe(self.gulp.dest(path.join('lib', build_dir), src_opts));
       });
