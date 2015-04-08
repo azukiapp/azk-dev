@@ -64,7 +64,8 @@ function AzkGulp(config) {
   config.lint    = config.lint    || [];
   config.clean   = config.clean   || true;
   config.default = config.default || [ "lint", "test" ];
-  this.config = config;
+  config.babel   = config.babel   || { optional: ['runtime'] };
+  this.config    = config;
 
   this.set_getters();
 
@@ -99,9 +100,6 @@ AzkGulp.prototype = {
         var help_opts = {
           description: 'you are looking at it.',
           aliases: ['h', '?'],
-          // afterPrintCallback: function(tasks) {
-          //   console.log(tasks);
-          // }
         };
         self.__gulp = self.help(require('gulp'), help_opts);
       }
@@ -188,7 +186,7 @@ AzkGulp.prototype = {
         return self.gulp.src(build_dir + '/**/*.js', src_opts)
           .pipe(self.watching ? self.plumber() : self.gutil.noop())
           .pipe(self.sourcemaps.init())
-          .pipe(self.babel())
+          .pipe(self.babel(self.config.babel));
           .pipe(self.sourcemaps.write())
           .pipe(self.gulp.dest(path.join('lib', build_dir), src_opts));
       });
