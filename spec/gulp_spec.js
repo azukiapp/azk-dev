@@ -77,7 +77,7 @@ describe("azk-dev gulp", function() {
     })
     .then(function(result) {
       for(var i = 0; i < result.length; i++) {
-        h.expect(result[i].isSymbolicLink()).to.ok;
+        h.expect(result[i].isFile()).to.ok;
       }
     });
   });

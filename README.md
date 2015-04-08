@@ -46,10 +46,10 @@ export default Helpers;
 
 ## Editor Configs
 
-Create symlinks to `shared/.jscsrc`, `shared/.jshintrc` and `shared/.editorconfig`
+Copy dotfiles `.jscsrc`, `.jshintrc` and `.editorconfig` from `shared` folder to current project. Use `--force` to overwrite.
 
 ```shell
-$  gulp editor-config
+$  gulp editor:config
 ```
 
 ## Deploy npm package

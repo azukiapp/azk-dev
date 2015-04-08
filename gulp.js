@@ -1,4 +1,5 @@
 var path   = require('path');
+var fs     = require('fs');
 var dotenv = require('dotenv');
 
 var dynamics = {
@@ -8,14 +9,18 @@ var dynamics = {
   babel         : 'gulp-babel',
   sourcemaps    : 'gulp-sourcemaps',
   symlink       : 'gulp-symlink',
+  help          : 'gulp-help',
+  notify        : 'gulp-notify',
+  plumber       : 'gulp-plumber',
+  debug         : 'gulp-debug',
   jscs          : 'gulp-jscs',
   jshint        : 'gulp-jshint',
   jshint_stylish: 'jshint-stylish',
   rimraf        : 'rimraf',
-  help          : 'gulp-help',
-  notify        : 'gulp-notify',
-  plumber       : 'gulp-plumber',
   sequence      : 'run-sequence',
+  ignore        : 'gulp-ignore',
+  chalk         : 'gulp-util/node_modules/chalk',
+  tildify       : 'gulp/node_modules/tildify',
 };
 
 var helps = {
@@ -25,9 +30,9 @@ var helps = {
   "clean:lib"         : "clean all transpiled files",
   "clean:lib:spec"    : "clean spec transpiled files",
   "clean:lib:src"     : "clean source transpiled files",
-  "editor:config"     : "create symlinks to config and lint dot files",
-  "editor:link:config": "create symlinks to .editorconfig file",
-  "editor:link:lint"  : "create symlinks to .jshintrc and .jscsrc files",
+  "editor:config"     : "copy dotfiles (config and lint) to current project",
+  "editor:copy:config": "copy .editorconfig file to current project",
+  "editor:copy:lint"  : "copy .jshintrc and .jscsrc files to current project",
   "jscs"              : "run jscs hover the source and spec files",
   "jshint"            : "run jshint hover the source and spec files",
   "lint"              : "run jshint and jscs hover the source and spec files",
@@ -106,7 +111,8 @@ AzkGulp.prototype = {
     self.__defineGetter__('yargs', function() {
       if (!self.__yargs) {
         self.__yargs = require('yargs')
-          .default('clean', self.config.clean);
+          .default('clean', self.config.clean)
+          .default('force', false);
       }
       return self.__yargs;
     });
@@ -128,14 +134,33 @@ AzkGulp.prototype = {
         files[i] = path.join('./', files[i]);
       }
 
+      var force = self.yargs.argv.force;
+      var cond  = function(file) {
+        var dest   = path.join(self.config.cwd, path.basename(file.path));
+        var full   = self.tildify(path.relative(process.cwd(), file.path));
+        var exists = fs.existsSync(dest);
+        if (force || !exists) {
+          if (exists) {
+            self.gutil.log("replacing: " + self.chalk.blue(full));
+          } else {
+            self.gutil.log("copying: " + self.chalk.green(full));
+          }
+          return true;
+        }
+        self.gutil.log("skiping: " + self.chalk.red(full));
+        return false;
+      }
+
       tasks.push(name);
       self.new_task(name, function() {
-        self.gulp.src(srcs).pipe(self.symlink(files, { force: true}));
+        self.gulp.src(srcs)
+          .pipe(self.ignore.include(cond))
+          .pipe(self.gulp.dest(self.config.cwd));
       });
     };
 
-    add_files('editor:link:lint', ['.jscsrc', '.jshintrc']);
-    add_files('editor:link:config', ['.editorconfig']);
+    add_files('editor:copy:lint', ['.jscsrc', '.jshintrc']);
+    add_files('editor:copy:config', ['.editorconfig']);
 
     self.new_task('editor:config', tasks);
   },
