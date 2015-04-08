@@ -15,6 +15,7 @@ var dynamics = {
   debug         : 'gulp-debug',
   jscs          : 'gulp-jscs',
   jshint        : 'gulp-jshint',
+  shell         : 'gulp-shell',
   jshint_stylish: 'jshint-stylish',
   rimraf        : 'rimraf',
   sequence      : 'run-sequence',
@@ -25,6 +26,8 @@ var dynamics = {
 
 var helps = {
   "babel"             : "transpile source and spec (es6 to es5).",
+  "babel:runtime:version": "shows the version of babel-runtime to be installed",
+  "babel:runtime:install": "install babel-runtime and save it in package.json",
   "babel:spec"        : "transpile spec (es6 to es5).",
   "babel:src"         : "transpile source (es6 to es5).",
   "clean:lib"         : "clean all transpiled files",
@@ -198,6 +201,26 @@ AzkGulp.prototype = {
     // Alias babel task to all babel tasks
     self.new_task('babel', babel_tasks);
     self.new_task('clean:lib', clean_tasks);
+
+    // Help to install babel
+    var version = function() {
+      var babel = require('gulp-babel/node_modules/babel-core');
+      return babel.version;
+    }
+    self.new_task('babel:runtime:version', function() {
+      self.gutil.log('babel version: ' + version());
+    });
+
+    self.new_task('babel:runtime:install', function() {
+      var command = "npm install babel-runtime@" + version() + " --save";
+      var stream  = self.shell(command);
+
+      self.gutil.log("running: " + self.chalk.green(command));
+      stream.write(new self.gutil.File());
+      stream.end();
+
+      return stream;
+    });
   },
 
   init_lints: function() {

@@ -32,6 +32,22 @@ $ gulp help
 - **lint:**    default: [];
 - **clean:**   default: true;
 - **default:** default: [ "lint", "test" ];
+- **babel:**   default: { optional: ['runtime'] };
+
+## Babel
+
+To use babel in your project require to install `babel-runtime`:
+
+```shell
+$ gulp babel:runtime:install
+```
+
+Or
+
+```shell
+$ gulp babel:runtime:version
+$ npm install babel-runtime@[version] --save
+```
 
 ## Chai
 
