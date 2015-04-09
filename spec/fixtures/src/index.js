@@ -1,4 +1,4 @@
-var Promise = require('bluebird');
+var BPromise = require('bluebird');
 
 // Simple example of the es6 code
 export class MyClass {
@@ -7,8 +7,8 @@ export class MyClass {
   }
 
   static delay() {
-    return Promise.coroutine(function* () {
-      yield Promise.delay(100);
+    return BPromise.coroutine(function* () {
+      yield BPromise.delay(100);
       return true;
     })();
   }

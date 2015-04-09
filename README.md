@@ -27,8 +27,8 @@ $ gulp help
 
 ##### Available configs:
 
-- **src:**     default: "src";
-- **spec:**    default: "spec";
+- **src:**     default: { src: "src"  , dest: "./lib/src" };
+- **spec:**    default: { src: "spec" , dest: "./lib/spec" };
 - **lint:**    default: [];
 - **clean:**   default: true;
 - **default:** default: [ "lint", "test" ];

@@ -108,16 +108,13 @@ describe("azk-dev gulp", function() {
       h.expect(result.out).to.match(/^\s*test\s*run all tests$/m);
     });
 
-    it("should have a clean tasks", function() {
-      h.expect(result.out).to.match(/^\s*clean:lib\s*.*$/m);
-      h.expect(result.out).to.match(/^\s*clean:lib:src\s*.*$/m);
-      h.expect(result.out).to.match(/^\s*clean:lib:spec\s*.*$/m);
-    });
-
     it("should have a babel tasks", function() {
       h.expect(result.out).to.match(/^\s*babel\s*.*$/m);
       h.expect(result.out).to.match(/^\s*babel:spec\s*.*$/m);
       h.expect(result.out).to.match(/^\s*babel:src\s*.*$/m);
+      h.expect(result.out).to.match(/^\s*babel:clean\s*.*$/m);
+      h.expect(result.out).to.match(/^\s*babel:clean:src\s*.*$/m);
+      h.expect(result.out).to.match(/^\s*babel:clean:spec\s*.*$/m);
     });
 
     it("should have a watch tasks to babel transpiler", function() {

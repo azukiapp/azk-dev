@@ -3,27 +3,25 @@ var fs     = require('fs');
 var dotenv = require('dotenv');
 
 var dynamics = {
-  // gulp          : 'gulp',
-  gutil         : 'gulp-util',
-  mocha         : 'gulp-mocha',
-  babel         : 'gulp-babel',
-  sourcemaps    : 'gulp-sourcemaps',
-  symlink       : 'gulp-symlink',
-  help          : 'gulp-help',
-  notify        : 'gulp-notify',
-  plumber       : 'gulp-plumber',
-  debug         : 'gulp-debug',
-  jscs          : 'gulp-jscs',
-  jshint        : 'gulp-jshint',
-  shell         : 'gulp-shell',
-  ignore        : 'gulp-ignore',
-  changed       : 'gulp-changed',
-  clean         : 'gulp-clean',
-  jshint_stylish: 'jshint-stylish',
-  rimraf        : 'rimraf',
-  sequence      : 'run-sequence',
-  chalk         : 'gulp-util/node_modules/chalk',
-  tildify       : 'gulp/node_modules/tildify',
+  gutil     : 'gulp-util',
+  mocha     : 'gulp-mocha',
+  babel     : 'gulp-babel',
+  sourcemaps: 'gulp-sourcemaps',
+  symlink   : 'gulp-symlink',
+  help      : 'gulp-help',
+  notify    : 'gulp-notify',
+  plumber   : 'gulp-plumber',
+  debug     : 'gulp-debug',
+  jscs      : 'gulp-jscs',
+  jshint    : 'gulp-jshint',
+  shell     : 'gulp-shell',
+  ignore    : 'gulp-ignore',
+  changed   : 'gulp-changed',
+  clean     : 'gulp-clean',
+  rimraf    : 'rimraf',
+  sequence  : 'run-sequence',
+  chalk     : 'gulp-util/node_modules/chalk',
+  tildify   : 'gulp/node_modules/tildify',
 };
 
 var helps = {
@@ -64,8 +62,8 @@ function AzkGulp(config) {
   this.watching = false;
 
   // Set default
-  config.src     = config.src     || "src";
-  config.spec    = config.spec    || "spec";
+  config.src     = config.src     || { src: "src" , dest: "./lib/src" };
+  config.spec    = config.spec    || { src: "spec", dest: "./lib/spec" };
   config.lint    = config.lint    || [];
   config.clean   = config.clean   || true;
   config.default = config.default || [ "lint", "test" ];
@@ -180,20 +178,19 @@ AzkGulp.prototype = {
       var clean_task = 'babel:clean:' + name;
       clean_tasks.push(clean_task);
       self.new_task(clean_task, function(cb) {
-        var dir = path.join(self.config.cwd, './lib', build_dir);
+        var dir = path.join(self.config.cwd, build_dir.dest);
         self.rimraf(dir, cb);
       });
 
       // clean
-      var babel_clean_task = 'babel:clean:' + name;
-      var relative = path.join('lib', build_dir);
+      var babel_clean_task = 'babel:fast_clean:' + name;
       self.new_task(babel_clean_task, false, function(cb) {
-        return self.gulp.src(relative + '/**/*.js', { cwd: self.config.cwd, read: false})
+        return self.gulp.src(build_dir.dest + '/**/*.js', { cwd: self.config.cwd, read: false})
           .pipe(self.watching ? self.plumber() : self.gutil.noop())
           // Not remove if origin still exist
           .pipe(self.ignore.exclude(function(file) {
-            var who    = path.relative(relative, file.path);
-            var origin = path.join(self.config.cwd, build_dir, who);
+            var who    = path.relative(build_dir.dest, file.path);
+            var origin = path.join(self.config.cwd, build_dir.src, who);
             return fs.existsSync(origin);
           }))
           .pipe(self.debug({ title: "babel:" + name + " - remove:"}))
@@ -204,15 +201,14 @@ AzkGulp.prototype = {
       var babel_task = 'babel:' + name;
       babel_tasks.push(babel_task);
       self.new_task(babel_task, [babel_clean_task], function () {
-        var dest = path.join('lib', build_dir);
-        return self.gulp.src(build_dir + '/**/*.js', src_opts)
-          .pipe(self.changed(dest, src_opts))
+        return self.gulp.src(build_dir.src + '/**/*.js', src_opts)
+          .pipe(self.changed(build_dir.dest, src_opts))
           .pipe(self.watching ? self.plumber() : self.gutil.noop())
           .pipe(self.debug({ title: "babel:" + name + " - transpiled:" }))
           .pipe(self.sourcemaps.init())
           .pipe(self.babel(self.config.babel))
           .pipe(self.sourcemaps.write())
-          .pipe(self.gulp.dest(dest, src_opts));
+          .pipe(self.gulp.dest(build_dir.dest, src_opts));
       });
     };
 
@@ -249,14 +245,14 @@ AzkGulp.prototype = {
     var src_opts = { cwd: self.config.cwd };
 
     var paths = self.config.lint;
-    paths.push(self.config.src  + '/**/*.js');
-    paths.push(self.config.spec + '/**/*.js');
+    paths.push(self.config.src.src  + '/**/*.js');
+    paths.push(self.config.spec.src + '/**/*.js');
 
     self.new_task('jshint', function() {
       return self.gulp.src(paths, src_opts)
         .pipe(self.watching ? self.plumber() : self.gutil.noop())
         .pipe(self.jshint(jshintrc))
-        .pipe(self.jshint.reporter(self.jshint_stylish))
+        .pipe(self.jshint.reporter(require('jshint-stylish')))
         .pipe(self.jshint.reporter('fail'))
     });
 
@@ -279,7 +275,7 @@ AzkGulp.prototype = {
 
     var add_watch = function(name, build_dir) {
       var task = 'babel:' + name;
-      var src  = build_dir + '/**/*.js';
+      var src  = build_dir.src + '/**/*.js';
       watch_all.tasks.push(task);
       watch_all.srcs.push(src);
       self.new_watch('watch:' + name, src, src_opts, ['screen:clean', task]);
@@ -296,7 +292,7 @@ AzkGulp.prototype = {
   init_mocha: function() {
     var self = this;
     var src_opts = { read: false, cwd: self.config.cwd };
-    var src = 'lib/' + self.config.spec + '/**/*_spec.js';
+    var src = self.config.spec.dest + '/**/*_spec.js';
     self.new_task('test', ['babel'], function() {
       process.env.NODE_ENV = process.env.NODE_ENV || "test";
       self.gulp.src(src, src_opts)
@@ -317,8 +313,8 @@ AzkGulp.prototype = {
 
     Object.keys(watch_tasks).forEach(function(task) {
       var src = [
-        self.config.src  + '/**/*.js',
-        self.config.spec + '/**/*.js',
+        self.config.src.src  + '/**/*.js',
+        self.config.spec.src + '/**/*.js',
       ];
       self.new_watch(task, src, { cwd: self.config.cwd }, watch_tasks[task]);
     });
