@@ -18,6 +18,7 @@ var dynamics = {
   ignore    : 'gulp-ignore',
   changed   : 'gulp-changed',
   clean     : 'gulp-clean',
+  cache     : 'gulp-cached',
   rimraf    : 'rimraf',
   sequence  : 'run-sequence',
   chalk     : 'gulp-util/node_modules/chalk',
@@ -251,6 +252,8 @@ AzkGulp.prototype = {
     self.new_task('jshint', function() {
       return self.gulp.src(paths, src_opts)
         .pipe(self.watching ? self.plumber() : self.gutil.noop())
+        .pipe(self.cache('jshint'))
+        .pipe(self.debug({ title: 'jshint'}))
         .pipe(self.jshint(jshintrc))
         .pipe(self.jshint.reporter(require('jshint-stylish')))
         .pipe(self.jshint.reporter('fail'))
@@ -259,6 +262,8 @@ AzkGulp.prototype = {
     self.new_task('jscs', function() {
       return self.gulp.src(paths, src_opts)
         .pipe(self.watching ? self.plumber() : self.gutil.noop())
+        .pipe(self.cache('jscs'))
+        .pipe(self.debug({ title: 'jscs'}))
         .pipe(self.jscs(jscsrc))
     });
 
