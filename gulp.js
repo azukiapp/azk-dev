@@ -16,38 +16,40 @@ var dynamics = {
   jscs          : 'gulp-jscs',
   jshint        : 'gulp-jshint',
   shell         : 'gulp-shell',
+  ignore        : 'gulp-ignore',
+  changed       : 'gulp-changed',
+  clean         : 'gulp-clean',
   jshint_stylish: 'jshint-stylish',
   rimraf        : 'rimraf',
   sequence      : 'run-sequence',
-  ignore        : 'gulp-ignore',
   chalk         : 'gulp-util/node_modules/chalk',
   tildify       : 'gulp/node_modules/tildify',
 };
 
 var helps = {
-  "babel"             : "transpile source and spec (es6 to es5).",
+  "babel"                : "transpile source and spec (es6 to es5).",
   "babel:runtime:version": "shows the version of babel-runtime to be installed",
   "babel:runtime:install": "install babel-runtime and save it in package.json",
-  "babel:spec"        : "transpile spec (es6 to es5).",
-  "babel:src"         : "transpile source (es6 to es5).",
-  "clean:lib"         : "clean all transpiled files",
-  "clean:lib:spec"    : "clean spec transpiled files",
-  "clean:lib:src"     : "clean source transpiled files",
-  "editor:config"     : "copy dotfiles (config and lint) to current project",
-  "editor:copy:config": "copy .editorconfig file to current project",
-  "editor:copy:lint"  : "copy .jshintrc and .jscsrc files to current project",
-  "jscs"              : "run jscs hover the source and spec files",
-  "jshint"            : "run jshint hover the source and spec files",
-  "lint"              : "run jshint and jscs hover the source and spec files",
-  "screen:clean"      : "clean screen (scroll bottom to the top)",
-  "test"              : "run all tests",
-  "watch"             : "wait for changes source and spec before run babel",
-  "watch:lint"        : "wait for changes source and spec before run lint",
-  "watch:lint:test"   : "wait for changes source and spec before run lint and tests",
-  "watch:spec"        : "wait for changes spec before run babel",
-  "watch:src"         : "wait for changes source before run babel",
-  "watch:test"        : "wait for changes source and spec before run tests",
-  "watch:test:lint"   : "wait for changes source and spec before run tests and lint",
+  "babel:spec"           : "transpile spec (es6 to es5).",
+  "babel:src"            : "transpile source (es6 to es5).",
+  "babel:clean"          : "clean all transpiled files",
+  "babel:clean:spec"     : "clean spec transpiled files",
+  "bebal:clean:src"      : "clean source transpiled files",
+  "editor:config"        : "copy dotfiles (config and lint) to current project",
+  "editor:copy:config"   : "copy .editorconfig file to current project",
+  "editor:copy:lint"     : "copy .jshintrc and .jscsrc files to current project",
+  "jscs"                 : "run jscs hover the source and spec files",
+  "jshint"               : "run jshint hover the source and spec files",
+  "lint"                 : "run jshint and jscs hover the source and spec files",
+  "screen:clean"         : "clean screen (scroll bottom to the top)",
+  "test"                 : "run all tests",
+  "watch"                : "wait for changes source and spec before run babel",
+  "watch:lint"           : "wait for changes source and spec before run lint",
+  "watch:lint:test"      : "wait for changes source and spec before run lint and tests",
+  "watch:spec"           : "wait for changes spec before run babel",
+  "watch:src"            : "wait for changes source before run babel",
+  "watch:test"           : "wait for changes source and spec before run tests",
+  "watch:test:lint"      : "wait for changes source and spec before run tests and lint",
 };
 
 var jshintrc = path.resolve(__dirname, 'shared', '.jshintrc');
@@ -174,24 +176,43 @@ AzkGulp.prototype = {
     var add_build = function(name, build_dir) {
       var src_opts = { cwd: self.config.cwd };
 
-      // clean
-      var clean_task = 'clean:lib:' + name;
+      // clean all files
+      var clean_task = 'babel:clean:' + name;
       clean_tasks.push(clean_task);
       self.new_task(clean_task, function(cb) {
         var dir = path.join(self.config.cwd, './lib', build_dir);
         self.rimraf(dir, cb);
       });
 
+      // clean
+      var babel_clean_task = 'babel:clean:' + name;
+      var relative = path.join('lib', build_dir);
+      self.new_task(babel_clean_task, false, function(cb) {
+        return self.gulp.src(relative + '/**/*.js', { cwd: self.config.cwd, read: false})
+          .pipe(self.watching ? self.plumber() : self.gutil.noop())
+          // Not remove if origin still exist
+          .pipe(self.ignore.exclude(function(file) {
+            var who    = path.relative(relative, file.path);
+            var origin = path.join(self.config.cwd, build_dir, who);
+            return fs.existsSync(origin);
+          }))
+          .pipe(self.debug({ title: "babel:" + name + " - remove:"}))
+          .pipe(self.clean());
+      });
+
       // babel
       var babel_task = 'babel:' + name;
       babel_tasks.push(babel_task);
-      self.new_task(babel_task, [clean_task], function () {
+      self.new_task(babel_task, [babel_clean_task], function () {
+        var dest = path.join('lib', build_dir);
         return self.gulp.src(build_dir + '/**/*.js', src_opts)
+          .pipe(self.changed(dest, src_opts))
           .pipe(self.watching ? self.plumber() : self.gutil.noop())
+          .pipe(self.debug({ title: "babel:" + name + " - transpiled:" }))
           .pipe(self.sourcemaps.init())
           .pipe(self.babel(self.config.babel))
           .pipe(self.sourcemaps.write())
-          .pipe(self.gulp.dest(path.join('lib', build_dir), src_opts));
+          .pipe(self.gulp.dest(dest, src_opts));
       });
     };
 
@@ -200,7 +221,7 @@ AzkGulp.prototype = {
 
     // Alias babel task to all babel tasks
     self.new_task('babel', babel_tasks);
-    self.new_task('clean:lib', clean_tasks);
+    self.new_task('babel:clean', clean_tasks);
 
     // Help to install babel
     var version = function() {
