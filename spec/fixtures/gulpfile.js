@@ -2,6 +2,7 @@
 var azk_gulp = require('../../gulp')({
   cwd  : __dirname,
   default: [ "show:envs" ],
+  sourcemaps_path: "/mytest",
   // babel: {},
 });
 

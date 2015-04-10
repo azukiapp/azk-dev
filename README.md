@@ -8,6 +8,7 @@ How to import commons azk-dev gulp tasks and extends:
 // gulpfile.js
 var azk_gulp = require('azk-dev/gulp')({
   cwd  : __dirname,
+  sourcemaps_path: "/mytest", // Custom path to prefix transpiled files
   lint: [ "bin/**/*.js" ], // Extra files for the lint analyzer
 });
 
@@ -33,6 +34,7 @@ $ gulp help
 - **clean:**   default: true;
 - **default:** default: [ "lint", "test" ];
 - **babel:**   default: { optional: ['runtime'] };
+- **sourcemaps_path** default: path.basename(process.cwd);
 
 ## Babel
 

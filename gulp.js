@@ -63,7 +63,8 @@ function AzkGulp(config) {
   this.watching = false;
 
   // Set default
-  config.src     = config.src     || { src: "src" , dest: "./lib/src" };
+  config.sourcemaps_path = config.sourcemaps_path || "/" + path.basename(config.cwd);
+  config.src     = config.src     || { src: "src" , dest: "./lib/src"  };
   config.spec    = config.spec    || { src: "spec", dest: "./lib/spec" };
   config.lint    = config.lint    || [];
   config.clean   = config.clean   || true;
@@ -208,7 +209,7 @@ AzkGulp.prototype = {
           .pipe(self.debug({ title: "babel:" + name + " - transpiled:" }))
           .pipe(self.sourcemaps.init())
           .pipe(self.babel(self.config.babel))
-          .pipe(self.sourcemaps.write())
+          .pipe(self.sourcemaps.write({ sourceRoot: path.join(self.config.sourcemaps_path, name) }))
           .pipe(self.gulp.dest(build_dir.dest, src_opts));
       });
     };
