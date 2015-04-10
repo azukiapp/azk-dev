@@ -20,7 +20,7 @@
   },
   "author": "Éverton Ribeiro <everton@azukiapp.com>",
   "homepage": "https://github.com/azukiapp/azk-dev",
-  "license": "Apache License 2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "chai": "^2.2.0",
     "chai-as-promised": "^4.3.0",
