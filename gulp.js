@@ -51,8 +51,10 @@ var helps = {
   "watch:test:lint"      : "wait for changes source and spec before run tests and lint",
 };
 
-var jshintrc = path.resolve(__dirname, 'shared', '.jshintrc');
-var jscsrc   = path.resolve(__dirname, 'shared', '.jscsrc');
+var dotfiles = {
+  jshintrc : path.resolve(__dirname, 'shared', '.jshintrc'),
+  jscsrc   : path.resolve(__dirname, 'shared', '.jscsrc'),
+};
 
 function AzkGulp(config) {
   if (!(this instanceof arguments.callee)) {
@@ -250,6 +252,10 @@ AzkGulp.prototype = {
     paths.push(self.config.src.src  + '/**/*.js');
     paths.push(self.config.spec.src + '/**/*.js');
 
+    // Default or project .jshintrc
+    var jshintrc = path.join(self.config.cwd + '.jshintrc');
+    if (!fs.existsSync(jshintrc)) { jshintrc = dotfiles.jshintrc; }
+
     self.new_task('jshint', function() {
       return self.gulp.src(paths, src_opts)
         .pipe(self.watching ? self.plumber() : self.gutil.noop())
@@ -259,6 +265,10 @@ AzkGulp.prototype = {
         .pipe(self.jshint.reporter(require('jshint-stylish')))
         .pipe(self.jshint.reporter('fail'))
     });
+
+    // Default or project .jscsrc
+    var jscsrc = path.join(self.config.cwd + '.jscsrc');
+    if (!fs.existsSync(jscsrc)) { jscsrc = dotfiles.jscsrc; }
 
     self.new_task('jscs', function() {
       return self.gulp.src(paths, src_opts)
