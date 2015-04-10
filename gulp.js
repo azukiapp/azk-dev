@@ -189,13 +189,22 @@ AzkGulp.prototype = {
       // clean
       var babel_clean_task = 'babel:fast_clean:' + name;
       self.new_task(babel_clean_task, false, function(cb) {
+        var stats = {
+          gulpfile: self._statsByFile('gulpfile.js'),
+          package : self._statsByFile('package.json'),
+        }
+
         return self.gulp.src(build_dir.dest + '/**/*.js', { cwd: self.config.cwd, read: false})
           .pipe(self.watching ? self.plumber() : self.gutil.noop())
           // Not remove if origin still exist
           .pipe(self.ignore.exclude(function(file) {
             var who    = path.relative(build_dir.dest, file.path);
             var origin = path.join(self.config.cwd, build_dir.src, who);
-            return fs.existsSync(origin);
+            return (
+              fs.existsSync(origin)
+              && (stats.gulpfile === null || stats.gulpfile.mtime < file.stat.mtime)
+              && (stats.package  === null || stats.package.mtime  < file.stat.mtime)
+            );
           }))
           .pipe(self.debug({ title: "babel:" + name + " - remove:"}))
           .pipe(self.clean());
@@ -358,6 +367,14 @@ AzkGulp.prototype = {
         self.gulp.watch(src, src_opts, [sequence_name]);
       });
     });
+  },
+
+  _statsByFile: function(file) {
+    file = path.join(this.config.cwd, file);
+    if (fs.existsSync(file)) {
+      return fs.statSync(file);
+    }
+    return null;
   }
 };
 
