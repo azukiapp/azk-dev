@@ -1,6 +1,7 @@
 var path   = require('path');
 var fs     = require('fs');
 var dotenv = require('dotenv');
+var spawn  = require('child_process').spawn;
 
 var dynamics = {
   gutil     : 'gulp-util',
@@ -361,11 +362,35 @@ AzkGulp.prototype = {
     self.new_task(sequence_name, false, function() {
       self.sequence.apply(self, subtasks);
     });
+
     self.new_task(task, function() {
-      self.watching = true;
-      self.sequence(sequence_name, function() {
-        self.gulp.watch(src, src_opts, [sequence_name]);
-      });
+      if (self.yargs.argv.realwatch) {
+        self.watching = true;
+        self.sequence(sequence_name, function() {
+          self.gulp.watch(src, src_opts, [sequence_name]);
+        });
+      } else {
+        // Store current process if any
+        var p;
+        var args  = process.argv.slice(0).concat('--realwatch');
+        var cmd   = args.shift();
+        var files = [
+          path.join(self.config.cwd, "gulpfile.js"),
+          path.join(self.config.cwd, "package.json")
+        ];
+
+        self.gulp.watch(files, spawnChildren);
+        // Comment the line below if you start your server by yourslef anywhere else
+        spawnChildren();
+
+        function spawnChildren(e) {
+          if(p) {
+              p.kill();
+          }
+
+          p = spawn(cmd, args, {stdio: 'inherit'});
+        }
+      }
     });
   },
 
