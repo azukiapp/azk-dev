@@ -10,7 +10,6 @@ var dynamics = {
   sourcemaps: 'gulp-sourcemaps',
   symlink   : 'gulp-symlink',
   help      : 'gulp-help',
-  notify    : 'gulp-notify',
   plumber   : 'gulp-plumber',
   debug     : 'gulp-debug',
   jscs      : 'gulp-jscs',
@@ -19,7 +18,7 @@ var dynamics = {
   ignore    : 'gulp-ignore',
   changed   : 'gulp-changed',
   clean     : 'gulp-clean',
-  cache     : 'gulp-cached',
+  cache     : 'gulp-cache',
   rimraf    : 'rimraf',
   sequence  : 'run-sequence',
   chalk     : 'chalk',
@@ -266,26 +265,49 @@ AzkGulp.prototype = {
     var jshintrc = path.join(self.config.cwd + '.jshintrc');
     if (!fs.existsSync(jshintrc)) { jshintrc = dotfiles.jshintrc; }
 
-    self.new_task('jshint', function() {
-      return self.gulp.src(paths, src_opts)
-        .pipe(self.watching ? self.plumber() : self.gutil.noop())
-        .pipe(self.cache('jshint'))
-        .pipe(self.debug({ title: 'jshint'}))
-        .pipe(self.jshint(jshintrc))
-        .pipe(self.jshint.reporter(require('jshint-stylish')))
-        .pipe(self.jshint.reporter('fail'))
-    });
-
     // Default or project .jscsrc
     var jscsrc = path.join(self.config.cwd + '.jscsrc');
     if (!fs.existsSync(jscsrc)) { jscsrc = dotfiles.jscsrc; }
 
+    var _makeLintCache = function(module, lintfile) {
+      // var self    = this;
+      var version   = require('gulp-' + module + '/package.json').version;
+      var lint_opts = fs.readFileSync(lintfile);
+
+      return self.cache(self[module](lintfile), {
+        // cache: self.cache.Cache({ cacheDirName: 'jshint' }),
+        key: function(file) {
+          // Key off the file contents, jshint version and options
+          return [file.contents.toString('utf8'), version, lint_opts].join('');
+        },
+        // What on the result indicates it was successful
+        success: function (hintedfile) {
+          return hintedfile[module].success;
+        },
+        // What to store as the result of the successful action
+        value: function(hintedfile) {
+          // Will be extended onto the file object on a cache hit next time task is ran
+          var result = {}; result[module] = hintedfile[module];
+          return result;
+        }
+      });
+    }
+
+    self.new_task('jshint', function() {
+      return self.gulp.src(paths, src_opts)
+        .pipe(self.watching ? self.plumber() : self.gutil.noop())
+        .pipe(_makeLintCache('jshint', jshintrc))
+        .pipe(self.jshint.reporter(require('jshint-stylish'), { verbose: true}))
+        .pipe(self.jshint.reporter('fail'));
+    });
+
     self.new_task('jscs', function() {
       return self.gulp.src(paths, src_opts)
         .pipe(self.watching ? self.plumber() : self.gutil.noop())
-        .pipe(self.cache('jscs'))
-        .pipe(self.debug({ title: 'jscs'}))
-        .pipe(self.jscs(jscsrc))
+        .pipe(_makeLintCache('jscs', jscsrc))
+        .pipe(require('gulp-jscs-stylish').combineWithHintResults())
+        .pipe(self.jshint.reporter(require('jshint-stylish'), { verbose: true}))
+        .pipe(self.jshint.reporter('fail'));
     });
 
     self.new_task('lint', ['jscs', 'jshint']);
