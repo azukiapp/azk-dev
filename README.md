@@ -1,5 +1,28 @@
 # azk-dev
 
+This project simplifies and standardizes the main development tasks of node.js projects that are part of the `azk` project. Among them are:
+
+- Gulp tasks collection that are common to `azk` projects;
+- Dotfiles for editor and lint tools configuration that maintain code standards: `.editorconfig`, `.jshintrc` and `.jscsrc`;
+- Helper for creating a `spec-helper.js` with `mocha`, `chai` and `chai-promise`;
+- `babel-node` for using `es6` in replacing repl-node;
+- `npm-deploy` script that assists in releasing npm packages;
+
+Among the gulp tasks we have:
+
+- `lint` and `watch:lint`: for code standards testing, via [jshint](jshint) and [jscs](jscs);
+- `babel[|:spec|:src]` and `babel[|:spec|:src]`: transpile `es6` code to `es5` via [babel](babel);
+- `editor:config`: copy the dotfiles to the current project folder, allowing their use in the editor and not only in the lint process;
+- `babel:runtime:[install|version]`: to assist in the babel runtime installation process;
+
+## Installation
+
+Before adding `azk-dev` to your project, be sure to remove `babel`, `babel-core` and `babel-babel-runtime` if they're declared as dependencies. Now install `azk-dev`:
+
+```shell
+$ npm install gulp azk-dev --save-dev
+```
+
 ## Gulp Tasks (commons azk project tasks)
 
 How to import commons azk-dev gulp tasks and extends:
