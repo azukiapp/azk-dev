@@ -22,8 +22,8 @@ var dynamics = {
   cache     : 'gulp-cached',
   rimraf    : 'rimraf',
   sequence  : 'run-sequence',
-  chalk     : 'gulp-util/node_modules/chalk',
-  tildify   : 'gulp/node_modules/tildify',
+  chalk     : 'chalk',
+  tildify   : 'tildify',
 };
 
 var helps = {
