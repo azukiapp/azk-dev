@@ -4,7 +4,7 @@
   "description": "Library which holds the basic tools for the development of azk projects",
   "main": "index.js",
   "scripts": {
-    "test": "./bin/gulp test",
+    "test": "gulp test",
     "deploy": "./bin/npm-deploy"
   },
   "repository": {
@@ -15,7 +15,6 @@
     "url": "https://github.com/azukiapp/azk-dev/issues"
   },
   "bin": {
-    "gulp": "./bin/gulp",
     "babel-node": "./bin/babel-node",
     "npm-deploy": "./bin/npm-deploy"
   },
@@ -30,7 +29,6 @@
     "chain": "^0.1.3",
     "chalk": "^1.0.0",
     "dotenv": "^1.1.0",
-    "gulp": "^3.8.11",
     "gulp-babel": "^5.0.0",
     "gulp-cache": "^0.2.8",
     "gulp-cached": "^1.0.4",
@@ -60,6 +58,9 @@
     "bluebird": "^2.9.24",
     "shelljs": "^0.4.0",
     "source-map-support": "^0.2.10"
+  },
+  "peerDependencies": {
+    "gulp": "^3.8.11"
   },
   "engines": {
     "node": ">= 0.10"
