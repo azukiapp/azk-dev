@@ -65,7 +65,6 @@ function AzkGulp(config) {
   this.watching = false;
 
   // Set default
-  config.sourcemaps_path = config.sourcemaps_path || "/" + path.basename(config.cwd);
   config.src     = config.src     || { src: "src" , dest: "./lib/src"  };
   config.spec    = config.spec    || { src: "spec", dest: "./lib/spec" };
   config.lint    = config.lint    || [];
@@ -120,6 +119,20 @@ AzkGulp.prototype = {
           .default('force', false);
       }
       return self.__yargs;
+    });
+
+    self.__defineGetter__('sourcemaps_path', function() {
+      var value = self.__sourcemaps_path || self.config.sourcemaps_path;
+      if (!value) {
+        value = "/" + path.basename(self.config.cwd);
+        var file = path.join(self.config.cwd, 'package.json');
+        try {
+          value += ":" + require(file).version;
+          self.__sourcemaps_path = value;
+        } catch (e) {}
+      }
+
+      return value;
     });
 
     Object.keys(dynamics).forEach(function(property) {
@@ -220,7 +233,7 @@ AzkGulp.prototype = {
           .pipe(self.debug({ title: "babel:" + name + " - transpiled:" }))
           .pipe(self.sourcemaps.init())
           .pipe(self.babel(self.config.babel))
-          .pipe(self.sourcemaps.write({ sourceRoot: path.join(self.config.sourcemaps_path, name) }))
+          .pipe(self.sourcemaps.write({ sourceRoot: path.join(self.sourcemaps_path, name) }))
           .pipe(self.gulp.dest(build_dir.dest, src_opts));
       });
     };
