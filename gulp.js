@@ -65,6 +65,7 @@ function AzkGulp(config) {
   this.watching = false;
 
   // Set default
+  config.mocha   = config.mocha   || { };
   config.src     = config.src     || { src: "src" , dest: "./lib/src"  };
   config.spec    = config.spec    || { src: "spec", dest: "./lib/spec" };
   config.lint    = config.lint    || [];
@@ -115,8 +116,12 @@ AzkGulp.prototype = {
     self.__defineGetter__('yargs', function() {
       if (!self.__yargs) {
         self.__yargs = require('yargs')
-          .default('clean', self.config.clean)
-          .default('force', false);
+          .default('clean'  , self.config.clean)
+          .default('force'  , false)
+          .default('timeout', self.config.mocha.timeout || 4000)
+          .default('invert' , self.config.mocha.invert  || false)
+          .default('grep'   , self.config.mocha.grep    || null)
+          .default('slow'   , false);
       }
       return self.__yargs;
     });
@@ -356,14 +361,19 @@ AzkGulp.prototype = {
     var src = self.config.spec.dest + '/**/*_spec.js';
     self.new_task('test', ['babel'], function() {
       process.env.NODE_ENV = process.env.NODE_ENV || "test";
+      var mocha_opts = {
+        reporter: 'spec',
+        // growl: 'true',
+        invert : self.yargs.argv.slow ? false : self.yargs.argv.invert,
+        grep   : self.yargs.argv.slow ? null  : self.yargs.argv.grep,
+        timeout: self.yargs.argv.slow ? self.config.mocha.slow_timeout || 50000 : self.yargs.argv.timeout,
+      };
+
+      self.gutil.log("Running mocha with:", mocha_opts);
+
       self.gulp.src(src, src_opts)
         .pipe(self.watching ? self.plumber() : self.gutil.noop())
-        .pipe(self.mocha({
-          reporter: 'spec',
-          // growl: 'true',
-          grep: self.yargs.argv.grep,
-          timeout: 4000
-        }));
+        .pipe(self.mocha(mocha_opts));
     });
 
     var watch_tasks = {
