@@ -117,6 +117,7 @@ This should run the following steps:
 ## TODO
 
 - Notify: https://github.com/mikaelbr/gulp-notify
+- Test for babel, lint and watch tasks
 
 ## License
 
