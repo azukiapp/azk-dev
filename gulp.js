@@ -252,7 +252,7 @@ AzkGulp.prototype = {
 
     // Help to install babel
     var version = function() {
-      var babel = require('gulp-babel/node_modules/babel-core');
+      var babel = require('babel-core');
       return babel.version;
     }
     self.new_task('babel:runtime:version', function() {
