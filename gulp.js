@@ -225,7 +225,7 @@ AzkGulp.prototype = {
             );
           }))
           .pipe(self.debug({ title: "babel:" + name + " - remove:"}))
-          .pipe(self.clean());
+          .pipe(self.clean({ force: true }));
       });
 
       // babel
