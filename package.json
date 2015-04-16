@@ -1,6 +1,6 @@
 {
   "name": "azk-dev",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Library which holds the basic tools for the development of azk projects",
   "main": "index.js",
   "scripts": {
