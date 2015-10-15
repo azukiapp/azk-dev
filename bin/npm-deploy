@@ -4,9 +4,9 @@ set -e
 
 version="${1:-patch}"
 
-if [ -n "$(git status --porcelain)" ]; then
+if [ -n "$(git status --porcelain -uno)" ]; then
   echo "\n$(tput setaf 1)Make commit the changes before publishing$(tput sgr0)\n"
-  git status
+  git status -uno
 else
   echo "Publish npm package..."
   npm test
