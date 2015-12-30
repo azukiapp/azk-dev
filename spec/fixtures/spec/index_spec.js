@@ -13,7 +13,19 @@ describe("MyClass", function() {
     h.expect(MyClass.divide(10, 5)).to.equal(2);
   });
 
-  it("should support generators", function() {
-    return h.expect(MyClass.delay()).to.eventually.equal(true);
+  describe("called for promises methods", function() {
+    var result = false;
+    beforeEach(() => result = false)
+    afterEach(()  => h.expect(result).to.ok);
+
+    it("should support generators", function() {
+      return MyClass.delay().then((r) => {
+        result = r;
+      });
+    });
+
+    it("should support generators in tests", function* () {
+      result = yield MyClass.delay();
+    });
   });
 });

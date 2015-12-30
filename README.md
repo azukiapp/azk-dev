@@ -1,10 +1,11 @@
 # azk-dev
 
-This project simplifies and standardizes the main development tasks of node.js projects that are part of the `azk` project. Among them are:
+This project simplifies and standardizes the main development tasks of node.js projects that are part of the [azk](https://github.com/azukiapp/azk) project. Among them are:
 
 - Gulp tasks collection that are common to `azk` projects;
 - Dotfiles for editor and lint tools configuration that maintain code standards: `.editorconfig`, `.jshintrc` and `.jscsrc`;
 - Helper for creating a `spec-helper.js` with `mocha`, `chai` and `chai-promise`;
+- Helper to use generator and promises to simplify tests;
 - `npm-deploy` script that assists in releasing npm packages;
 
 Among the gulp tasks we have:
@@ -82,6 +83,14 @@ var Helpers = {
 };
 
 export default Helpers;
+```
+
+## Test with generators support
+
+```js
+var BPromise = require('bluebird');
+var enable_generators = require('azk-dev/generators');
+enable_generators((fn) => BPromise.coroutine(fn)());
 ```
 
 ## Editor Configs

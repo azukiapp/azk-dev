@@ -429,10 +429,7 @@ AzkGulp.prototype = {
         spawnChildren();
 
         function spawnChildren(e) {
-          if(p) {
-              p.kill();
-          }
-
+          if(p) { p.kill(); }
           p = spawn(cmd, args, {stdio: 'inherit'});
         }
       }

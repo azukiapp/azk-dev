@@ -46,7 +46,7 @@
     "gulp-symlink": "^2.1.0",
     "gulp-util": "^3.0.4",
     "jshint-stylish": "^1.0.1",
-    "mocha": "^2.2.1",
+    "mocha": "^2.2.5",
     "rimraf": "^2.3.2",
     "run-sequence": "^1.0.2",
     "tildify": "^1.0.0",
