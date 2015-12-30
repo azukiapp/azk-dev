@@ -4,7 +4,7 @@ This project simplifies and standardizes the main development tasks of node.js p
 
 - Gulp tasks collection that are common to `azk` projects;
 - Dotfiles for editor and lint tools configuration that maintain code standards: `.editorconfig`, `.jshintrc` and `.jscsrc`;
-- Helper for creating a `spec-helper.js` with `mocha`, `chai` and `chai-promise`;
+- Helper for creating a `spec-helper.js` with `mocha`, `chai`, `chai-subset`and `chai-promise`;
 - Helper to use generator and promises to simplify tests;
 - `npm-deploy` script that assists in releasing npm packages;
 

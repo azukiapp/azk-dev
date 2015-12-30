@@ -52,6 +52,8 @@ describe("azk-dev gulp", function() {
   it("should support run tests", function(cb) {
     runGulp("gulp test", function() {
       h.expect(result.out).to.match(/\s* ✓ should divide\s*.*$/m);
+      h.expect(result.out).to.match(/\s* ✓ should create a instance\s*.*$/m);
+      h.expect(result.out).to.not.match(/\s* \d* failing\s*.*$/m);
       h.expect(result.code).to.equal(0);
       cb();
     });
