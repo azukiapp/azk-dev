@@ -1,5 +1,5 @@
 
 // Helper to use expect
 module.exports = {
-  expect : require('../chai').expect,
+  expect : require('../lib/chai').expect,
 };

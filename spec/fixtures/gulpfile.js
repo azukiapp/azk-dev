@@ -1,5 +1,5 @@
 
-var azk_gulp = require('../../gulp')({
+var azk_gulp = require('../../lib/gulp')({
   cwd  : __dirname,
   default: [ "show:envs" ],
   sourcemaps_path: "/mytest",

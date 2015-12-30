@@ -29,7 +29,7 @@ How to import commons azk-dev gulp tasks and extends:
 
 ```js
 // gulpfile.js
-var azk_gulp = require('azk-dev/gulp')({
+var azk_gulp = require('azk-dev/lib/gulp')({
   cwd  : __dirname,
   sourcemaps_path: "/mytest", // Custom path to prefix transpiled files
   lint: [ "bin/**/*.js" ], // Extra files for the lint analyzer
@@ -79,7 +79,7 @@ $ npm install babel-runtime@[version] --save
 ```js
 // spec/spec-help.js
 var Helpers = {
-  expect : require('azk-dev/chai').expect,
+  expect : require('azk-dev/lib/chai').expect,
 };
 
 export default Helpers;
@@ -89,7 +89,7 @@ export default Helpers;
 
 ```js
 var BPromise = require('bluebird');
-var enable_generators = require('azk-dev/generators');
+var enable_generators = require('azk-dev/lib/generators');
 enable_generators((fn) => BPromise.coroutine(fn)());
 ```
 

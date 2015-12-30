@@ -33,7 +33,7 @@ gulp.task('watch:test:sequence', function() {
 });
 
 gulp.task('watch:test', function() {
-  var src  = ['./*.js', 'spec/*.js', 'spec/fixtures/!(lib)/*.js'];
+  var src  = ['./*.js', 'lib/*.js', 'spec/*.js', 'spec/fixtures/!(lib)/*.js'];
   var task = 'watch:test:sequence';
   watching = true;
   runSequence(task, function() { gulp.watch(src, [task]); });
