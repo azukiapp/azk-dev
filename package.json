@@ -24,7 +24,7 @@
   "homepage": "https://github.com/azukiapp/azk-dev",
   "license": "Apache-2.0",
   "dependencies": {
-    "babel-core": "^5.1.9",
+    "babel-core": "^6.3.26",
     "chai": "^2.2.0",
     "chai-as-promised": "^4.3.0",
     "chai-subset": "^1.2.0",
@@ -57,14 +57,14 @@
     "yargs": "^3.6.0"
   },
   "devDependencies": {
-    "babel": "^5.0.10",
+    "babel": "^6.3.26",
     "bluebird": "^2.9.24",
     "shelljs": "^0.4.0",
     "source-map-support": "^0.2.10"
   },
   "peerDependencies": {
     "gulp": "^3.8.11",
-    "babel-runtime": "^5.1.9"
+    "babel-polyfill": "^6.3.14"
   },
   "engines": {
     "node": ">= 0.10"

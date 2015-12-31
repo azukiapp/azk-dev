@@ -3,7 +3,7 @@ var azk_gulp = require('../../lib/gulp')({
   cwd  : __dirname,
   default: [ "show:envs" ],
   sourcemaps_path: "/mytest",
-  // babel: {},
+  // babel: { optional: [ "runtime" ]},
 });
 
 var gulp = azk_gulp.gulp;

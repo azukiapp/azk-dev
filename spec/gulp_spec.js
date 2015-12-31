@@ -14,7 +14,6 @@ describe("azk-dev gulp", function() {
     shell.exec(cmd, { silent: true }, function(code, out) {
       result.code = code;
       result.out  = out;
-      // console.log(out);
       cb(null, result);
     });
   };
@@ -105,9 +104,9 @@ describe("azk-dev gulp", function() {
     });
 
     it("should have a full help and custom help", function() {
-      h.expect(result.out).to.match(/^\s*default\s*Run "show:envs" tasks$/m);
+      h.expect(result.out).to.match(/^\s*default\s*Run "show:envs" tasks \[show:envs\]$/m);
       h.expect(result.out).to.match(/^\s*show:args\s*custom help$/m);
-      h.expect(result.out).to.match(/^\s*test\s*run all tests$/m);
+      h.expect(result.out).to.match(/^\s*test\s*run all tests \[babel\]$/m);
     });
 
     it("should have a babel tasks", function() {
