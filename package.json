@@ -25,6 +25,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "babel-core": "^6.3.26",
+    "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-preset-es2015": "^6.3.13",
     "chai": "^3.4.1",
     "chai-as-promised": "^5.2.0",
     "chai-subset": "^1.2.0",

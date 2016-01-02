@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   * [Chai] Adding chai-subset and change load order of the chai plugins;
   * [Babel] Adding `babel:polyfill:install` gulp task, to assist in the installation of the `babel-polyfill` lib;
   * [Babel] Adding `babel:core:version` gulp task, it helps to find out the version of the babel `azk-dev` this using;
+  * [Babel] Configure babel for use present `es2015` and plugin `add-module-exports` by default;
 
 * Deprecations
   * [Babel] The "runtime" option is no longer default, and its use generates a depreciation alert. The dependence "babel-polyfill" should be used instead;
