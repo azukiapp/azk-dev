@@ -51,27 +51,26 @@ $ gulp help
 
 ##### Available configs:
 
-- **src:**     default: { src: "src"  , dest: "./lib/src" };
-- **spec:**    default: { src: "spec" , dest: "./lib/spec" };
-- **lint:**    default: [];
-- **clean:**   default: true;
-- **default:** default: [ "lint", "test" ];
-- **babel:**   default: { optional: ['runtime'] };
+- **src:**     default: `{ src: "src"  , dest: "./lib/src" }`;
+- **spec:**    default: `{ src: "spec" , dest: "./lib/spec" }`;
+- **lint:**    default: `[]`;
+- **clean:**   default: `true`;
+- **default:** default: `[ "lint", "test" ]`;
+- **babel:**   default:
+  ```
+  {
+    presets: ['es2015'],
+    plugins: ['add-module-exports'],
+  }
+  ```
 - **sourcemaps_path** default: path.basename(process.cwd);
 
 ## Babel
 
-To use babel in your project require to install `babel-runtime`:
+If you use "generators" in your code, you'll need to install `babel-polyfill`:
 
 ```shell
-$ gulp babel:runtime:install
-```
-
-Or
-
-```shell
-$ gulp babel:runtime:version
-$ npm install babel-runtime@[version] --save
+$ gulp babel:polyfill:install
 ```
 
 ## Chai
@@ -126,6 +125,9 @@ This should run the following steps:
 
 - Notify: https://github.com/mikaelbr/gulp-notify
 - Test for babel, lint and watch tasks
+- Improving version increment system by modifying the CHANGELOG.md when the version is incremented:
+  - https://www.npmjs.com/package/mversion
+  - https://github.com/mgol/npm-bump
 
 ## License
 

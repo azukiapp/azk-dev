@@ -104,7 +104,7 @@ describe("azk-dev gulp", function() {
     });
 
     it("should have a full help and custom help", function() {
-      h.expect(result.out).to.match(/^\s*default\s*Run "show:envs" tasks \[show:envs\]$/m);
+      h.expect(result.out).to.match(/^\s*default\s*Run default tasks: \[show:envs\]$/m);
       h.expect(result.out).to.match(/^\s*show:args\s*custom help$/m);
       h.expect(result.out).to.match(/^\s*test\s*run all tests \[babel\]$/m);
     });

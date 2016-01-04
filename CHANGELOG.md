@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## dev
 
 * Enhancements
+  * [Core] Modularizing `AzkGulp` in more pieces;
   * [Generators] Adding support to use generators and promises in tests;
   * [Chai] Adding chai-subset and change load order of the chai plugins;
   * [Babel] Adding `babel:polyfill:install` gulp task, to assist in the installation of the `babel-polyfill` lib;
