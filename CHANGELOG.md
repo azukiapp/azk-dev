@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## dev
+## v0.2.0 - (2016-01-04)
 
 * Enhancements
   * [Core] Modularizing `AzkGulp` in more pieces;
