@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Deprecations
   * [jscs] `validateJSDoc` is deprecated, use `jsDoc` in replace;
+  * [Core] Adding dependencie `jshint` and turning `babel-polyfill` a optional dependencie;
 
 ## v0.2.0 - (2016-01-04)
 
