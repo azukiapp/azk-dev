@@ -1,5 +1,9 @@
 import { Other as OtherClass } from './other';
-import 'babel-polyfill';
+
+try {
+  require('babel-polyfill');
+} catch (e) {}
+
 import BPromise from 'bluebird';
 
 // Simple example of the es6 code

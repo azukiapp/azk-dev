@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.3.0 - (2016-01-12)
+
+* Deprecations
+  * [Specs] `--slow` is not supported, all tests are performed by standard now. The `--skip-slow` option comes into existence as inverse replacement;
+
 ## v0.2.1 - (2016-01-05)
 
 * Deprecations

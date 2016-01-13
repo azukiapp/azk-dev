@@ -1,6 +1,6 @@
 {
   "name": "azk-dev",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Library which holds the basic tools for the development of azk projects",
   "main": "lib",
   "directories": {

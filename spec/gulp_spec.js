@@ -48,16 +48,6 @@ describe("azk-dev gulp", function() {
     });
   });
 
-  it("should support run tests", function(cb) {
-    runGulp("gulp test", function() {
-      h.expect(result.out).to.match(/\s* ✓ should divide\s*.*$/m);
-      h.expect(result.out).to.match(/\s* ✓ should create a instance\s*.*$/m);
-      h.expect(result.out).to.not.match(/\s* \d* failing\s*.*$/m);
-      h.expect(result.code).to.equal(0);
-      cb();
-    });
-  });
-
   it("should create a links", function() {
     var check_files = function() {
       var file, promises = [];
@@ -90,6 +80,50 @@ describe("azk-dev gulp", function() {
         h.expect(result.out).to.match(/^\s*TEST_VAR_FROM_FILE: 'thefile'/m);
         h.expect(result.out).to.match(/\s*TEST_VAR_FROM_ENV: 'foobar'/m);
       });
+  });
+
+  describe("call test", function() {
+    this.timeout(50000);
+
+    it("should run all test and not skiped slow by default", function(cb) {
+      runGulp("gulp test", function() {
+        h.expect(result.out).to.match(/\s* ✓ should divide\s*.*$/m);
+        h.expect(result.out).to.match(/\s* ✓ should create a instance\s*.*$/m);
+        h.expect(result.out).to.match(/\s* ✓ should skip @slow test\s*.*$/m);
+        h.expect(result.out).to.not.match(/\s* \d* failing\s*.*$/m);
+        h.expect(result.code).to.equal(0);
+        cb();
+      });
+    });
+
+    it("should run all tests and skip @slow if required", function(cb) {
+      runGulp("gulp test --skip-slow", function() {
+        h.expect(result.out).to.match(/\s* ✓ should divide\s*.*$/m);
+        h.expect(result.out).to.match(/\s* ✓ should create a instance\s*.*$/m);
+        h.expect(result.out).to.not.match(/\s* ✓ should skip @slow test\s*.*$/m);
+        h.expect(result.out).to.not.match(/\s* \d* failing\s*.*$/m);
+        h.expect(result.code).to.equal(0);
+        cb();
+      });
+    });
+
+    it("should run only spes match if grep option", function(cb) {
+      runGulp("gulp test --grep='should divide'", function() {
+        h.expect(result.out).to.match(/\s* ✓ should divide\s*.*$/m);
+        h.expect(result.out).to.not.match(/\s* ✓ should create a instance\s*.*$/m);
+        h.expect(result.out).to.not.match(/\s* ✓ should skip @slow test\s*.*$/m);
+        h.expect(result.out).to.not.match(/\s* \d* failing\s*.*$/m);
+        h.expect(result.code).to.equal(0);
+        cb();
+      });
+    })
+
+    it("should fail process if spec not pass", function(cb) {
+      runGulp("gulp test --forcefail", function() {
+        h.expect(result.code).to.equal(7);
+        cb();
+      });
+    })
   });
 
   describe("call help", function() {
